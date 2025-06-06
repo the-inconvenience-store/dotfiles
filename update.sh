@@ -38,7 +38,7 @@ function doIt() {
     # Copy new files and directories that don't exist in home
     eval "rsync $exclude_args -avh --no-perms --ignore-existing . ~/"
     
-    source ~/.zshrc;
+    zsh;
 }
 
 if [ "$1" == "--force" -o "$1" == "-f" ]; then
