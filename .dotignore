@@ -1,0 +1,16 @@
+/.dotignore
+
+# Git and system files
+.git/
+.DS_Store
+
+# Script and documentation files
+update.sh
+README.md
+LICENSE-MIT.txt
+.dotignore
+
+# Add any other files/folders you want to exclude
+# Example:
+# .ssh/
+# .gnupg/
