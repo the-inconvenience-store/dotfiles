@@ -6,6 +6,7 @@
 
 # Script and documentation files
 update.sh
+brew.sh
 README.md
 LICENSE-MIT.txt
 .dotignore
