@@ -13,6 +13,8 @@ README.md
 LICENSE-MIT.txt
 .dotignore
 .gitignore
+zsh-install.sh
+apt.sh
 
 # Add any other files/folders you want to exclude
 
