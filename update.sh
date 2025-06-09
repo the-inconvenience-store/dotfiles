@@ -20,9 +20,11 @@ function doIt() {
         ".git/"
         ".DS_Store"
         "update.sh"
+        "brew.sh"
         "README.md"
         "LICENSE-MIT.txt"
         ".dotignore"
+        ".gitignore"
     )
     
     # Add default exclusions if .dotignore doesn't exist
