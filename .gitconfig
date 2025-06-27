@@ -1,0 +1,14 @@
+# This is Git's per-user configuration file.
+[user]
+	email = 6634981+the-inconvenience-store@users.noreply.github.com
+# Please adapt and uncomment the following lines:
+#	name = Sam Stevens
+#	email = samstevens@Sams-Mac-mini.local
+[init]
+  defaultBranch = main
+
+[alias]
+  co = checkout
+  br = branch
+  ci = commit
+  ss = status

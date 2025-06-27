@@ -1,7 +1,6 @@
 alias cat="bat --theme auto:system --theme-dark gruvbox-dark --theme-light gruvbox-light --paging=never"
 alias ls="eza"
 alias du="dua"
-alias grep="rg"
 alias -- -='z -'
 alias 1='z -1'
 alias 2='z -2'
