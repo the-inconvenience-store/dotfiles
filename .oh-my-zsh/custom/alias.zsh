@@ -11,3 +11,7 @@ alias 6='z -6'
 alias 7='z -7'
 alias 8='z -8'
 alias 9='z -9'
+alias dcu="docker compose up -d"
+alias dcd="docker compose down"
+alias dcr="docker compose down && docker compose up -d"
+alias sbt="npx @agentdeskai/browser-tools-server@latest"
