@@ -104,8 +104,6 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-
-
 export BIN_PATH=/Users/samstevens/.local/bin:$PATH
 # pnpm
 export PNPM_HOME="/Users/samstevens/Library/pnpm"
@@ -119,6 +117,7 @@ export SDL2_INCLUDE_PATH="/opt/homebrew/include"
 export SDL2_LIB_PATH="/opt/homebrew/lib"
 
 eval "$(zoxide init zsh)"
+export PATH="$PATH:/Users/samstevens/.dotnet/tools"
 
 if type brew &>/dev/null; then
     FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"

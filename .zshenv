@@ -103,8 +103,6 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-
-
 export BIN_PATH=/Users/samstevens/.local/bin:$PATH
 # pnpm
 export PNPM_HOME="/Users/samstevens/Library/pnpm"
@@ -117,6 +115,20 @@ export PKG_CONFIG_PATH="/opt/homebrew/lib/pkgconfig:$PKG_CONFIG_PATH"
 export SDL2_INCLUDE_PATH="/opt/homebrew/include"
 export SDL2_LIB_PATH="/opt/homebrew/lib"
 
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init - zsh)"
+eval "$(zoxide init zsh)"
+export PATH="$PATH:/Users/samstevens/.dotnet/tools"
+
+if type brew &>/dev/null; then
+    FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+    autoload -Uz compinit
+    compinit
+fi
+
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# Added by OrbStack: command-line tools and integration
+# This won't be added again if you remove it.
+source ~/.orbstack/shell/init.zsh 2>/dev/null || :
+
+# Added by `rbenv init` on Wed 16 Jul 2025 14:11:56 AEST
+eval "$(rbenv init - --no-rehash zsh)"

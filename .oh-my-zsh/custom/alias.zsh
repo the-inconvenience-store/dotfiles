@@ -15,3 +15,6 @@ alias dcu="docker compose up -d"
 alias dcd="docker compose down"
 alias dcr="docker compose down && docker compose up -d"
 alias sbt="npx @agentdeskai/browser-tools-server@latest"
+
+alias dotconfig="code ~/.dotfiles"
+alias dotup="~/.dotfiles/update.sh"
