@@ -103,6 +103,9 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+export DO_NOT_TRACK="1"
+
+autoload -U compinit; compinit
 
 export BIN_PATH=/Users/samstevens/.local/bin:$PATH
 # pnpm
@@ -133,3 +136,5 @@ source ~/.orbstack/shell/init.zsh 2>/dev/null || :
 
 # Added by `rbenv init` on Wed 16 Jul 2025 14:11:56 AEST
 eval "$(rbenv init - --no-rehash zsh)"
+
+source <(kubectl completion zsh)

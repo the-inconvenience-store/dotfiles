@@ -115,7 +115,6 @@ export PKG_CONFIG_PATH="/opt/homebrew/lib/pkgconfig:$PKG_CONFIG_PATH"
 export SDL2_INCLUDE_PATH="/opt/homebrew/include"
 export SDL2_LIB_PATH="/opt/homebrew/lib"
 
-eval "$(zoxide init zsh)"
 export PATH="$PATH:/Users/samstevens/.dotnet/tools"
 
 if type brew &>/dev/null; then
