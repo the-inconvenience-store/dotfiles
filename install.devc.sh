@@ -8,6 +8,13 @@ eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 source ./brew.sh
 
+# Copy .oh-my-zsh directory if it exists in dotfiles
+if [ -d ".oh-my-zsh" ]; then
+    echo "Copying .oh-my-zsh to home directory..."
+    cp -r .oh-my-zsh "$HOME/"
+    echo "Copied .oh-my-zsh to $HOME/.oh-my-zsh"
+fi
+
 # Add missing commands to .zshrc if they don't exist
 ZSHRC_FILE="$HOME/.zshrc"
 
