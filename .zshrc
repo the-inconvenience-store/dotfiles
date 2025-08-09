@@ -70,8 +70,8 @@ ZSH_THEME="robbyrussell"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-
-plugins=(git zsh-autosuggestions)
+autoload -U compinit; compinit
+plugins=(git zsh-autosuggestions nx-completion)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -104,8 +104,6 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 export DO_NOT_TRACK="1"
-
-autoload -U compinit; compinit
 
 export BIN_PATH=/Users/samstevens/.local/bin:$PATH
 # pnpm

@@ -18,3 +18,5 @@ alias sbt="npx @agentdeskai/browser-tools-server@latest"
 
 alias dotconfig="code ~/.dotfiles"
 alias dotup="~/.dotfiles/update.sh"
+
+alias cls-complete-cache="rm -rf ~/.zcompdump* && autoload -U compinit && compinit -D"
