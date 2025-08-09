@@ -1,5 +1,9 @@
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
+# Check and add homebrew shellenv
+if command -v brew &> /dev/null && ! grep -q "brew shellenv" "$ZSHRC_FILE"; then
+    echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> "$ZSHRC_FILE"
+    echo "Added homebrew shellenv to .zshrc"
+fi
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 source ./brew.sh
@@ -17,12 +21,6 @@ fi
 if command -v kubectl &> /dev/null && ! grep -q "kubectl completion" "$ZSHRC_FILE"; then
     echo 'source <(kubectl completion zsh)' >> "$ZSHRC_FILE"
     echo "Added kubectl completion to .zshrc"
-fi
-
-# Check and add homebrew shellenv
-if command -v brew &> /dev/null && ! grep -q "brew shellenv" "$ZSHRC_FILE"; then
-    echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> "$ZSHRC_FILE"
-    echo "Added homebrew shellenv to .zshrc"
 fi
 
 # Check and add brew completion setup
