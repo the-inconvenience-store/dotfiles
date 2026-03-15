@@ -1,7 +1,23 @@
 #!/bin/bash
 cd "$(dirname "${BASH_SOURCE}")";
 
-git pull origin main;
+skip_pull=false
+force_update=false
+
+for arg in "$@"; do
+    case "$arg" in
+        -np|--no-pull)
+            skip_pull=true
+            ;;
+        -f|--force)
+            force_update=true
+            ;;
+    esac
+done
+
+if [ "$skip_pull" = false ]; then
+    git pull origin main;
+fi
 
 function doIt() {
     # Read exclusions from .dotignore file if it exists
@@ -43,7 +59,7 @@ function doIt() {
     zsh;
 }
 
-if [ "$1" == "--force" -o "$1" == "-f" ]; then
+if [ "$force_update" = true ]; then
     doIt;
 else
     read -p "This may overwrite existing files in your home directory. Are you sure? (y/n) " -n 1;

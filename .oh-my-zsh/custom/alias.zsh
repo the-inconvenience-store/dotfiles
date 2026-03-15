@@ -15,8 +15,14 @@ alias dcu="docker compose up -d"
 alias dcd="docker compose down"
 alias dcr="docker compose down && docker compose up -d"
 alias sbt="npx @agentdeskai/browser-tools-server@latest"
-
-alias dotconfig="code ~/.dotfiles"
+alias tailphim=" sudo kubectl port-forward -n seraphim-dev service/traefik-ingress \
+  --address 100.82.185.12 \
+  80:80 443:443"
+alias dotconf="lvim ~/.dotfiles"
 alias dotup="~/.dotfiles/update.sh"
-
+alias tu="tilt up"
+alias td="tilt down"
+#alias tr="tilt down && tilt up"
+alias rotate90="displayplacer \"id:5A071958-B098-403C-BD96-1910ACE949C2 degree:90\""
+alias rotate0="displayplacer \"id:5A071958-B098-403C-BD96-1910ACE949C2 degree:0\""
 alias cls-complete-cache="rm -rf ~/.zcompdump* && autoload -U compinit && compinit -D"

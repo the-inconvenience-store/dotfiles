@@ -15,7 +15,8 @@ LICENSE-MIT.txt
 .gitignore
 zsh-install.sh
 apt.sh
-
+install.sh
+install.devc.sh
 # Add any other files/folders you want to exclude
 
 # Example:

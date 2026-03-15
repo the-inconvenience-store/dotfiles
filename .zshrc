@@ -136,3 +136,29 @@ source ~/.orbstack/shell/init.zsh 2>/dev/null || :
 eval "$(rbenv init - --no-rehash zsh)"
 
 source <(kubectl completion zsh)
+
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/Users/samstevens/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/Users/samstevens/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/Users/samstevens/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/Users/samstevens/miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+export SOPS_AGE_KEY_FILE="$HOME/.config/sops/age/keys.txt"
+export PATH="$PATH:$(go env GOPATH)/bin"
+export PATH="$PATH:$HOME/.cargo/bin"
+
+# bun completions
+[ -s "/Users/samstevens/.bun/_bun" ] && source "/Users/samstevens/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
