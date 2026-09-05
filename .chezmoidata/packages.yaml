@@ -23,7 +23,9 @@ packages:
       - tmux
       - herdr
       - mole
-    casks: []
+      - tailscale
+    casks:
+      - vorssaint
   linux:
     apt:
       - build-essential
@@ -43,3 +45,4 @@ packages:
       - dua-cli
       - zoxide
       - tmux
+      - tailscale
