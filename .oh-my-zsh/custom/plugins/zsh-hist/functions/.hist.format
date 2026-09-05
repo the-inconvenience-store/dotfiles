@@ -1,0 +1,40 @@
+#!/bin/zsh
+zmodload -F zsh/parameter p:functions
+
+.hist.format() {
+  emulate -L zsh
+  setopt extendedglob warncreateglobal
+
+  REPLY="$1"
+  {
+    setopt NO_aliases
+    eval ".hist.tmp.() { $1 }" 2>/dev/null ||
+        return
+
+    [[ ${#${(Z+C+A)1}:#[;(]} == ${#${(Z+C+A)functions[.hist.tmp.]}:#[;(]} ]] ||
+        return
+
+    if zstyle -t :hist: expand-aliases; then
+      setopt aliases
+      eval ".hist.tmp.() { $1 }" 2>/dev/null ||
+          return
+    fi
+
+    REPLY=''
+    local body=$'\n'"$functions[.hist.tmp.]"
+    local word chunk indent prefix
+    for word in ${(Z+n+)body}; do
+      chunk=${(M)body#*$word}
+      body=${body#$chunk}
+      prefix=${${chunk%$word}%%$'\n'$'\t'##( |)}
+      indent=${${chunk#$prefix}%$word}
+      REPLY+=$prefix${indent%$'\t'( |)}$word
+    done
+    REPLY=${REPLY#$'\n'}
+  } always {
+    [[ -v functions[.hist.tmp.] ]] &&
+        unfunction .hist.tmp.
+  }
+}
+
+.hist.format "$@"

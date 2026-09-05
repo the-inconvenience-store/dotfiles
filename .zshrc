@@ -71,7 +71,7 @@ ZSH_THEME="robbyrussell"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 autoload -U compinit; compinit
-plugins=(git zsh-autosuggestions nx-completion)
+plugins=(git zsh-autosuggestions nx-completion direnv)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -162,3 +162,5 @@ export PATH="$PATH:$HOME/.cargo/bin"
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+source ~/.oh-my-zsh/custom/plugins/zsh-hist/zsh-hist.plugin.zsh

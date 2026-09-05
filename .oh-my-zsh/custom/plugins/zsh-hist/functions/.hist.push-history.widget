@@ -1,0 +1,19 @@
+#!/bin/zsh
+emulate -L zsh; setopt extendedglob warncreateglobal
+
+if [[ $CONTEXT == cont ]]; then
+  zle push-line-or-edit
+
+else
+  if [[ $BUFFER == [[:IFS:]]# ]]; then
+    BUFFER=''
+    return 1
+  fi
+
+  local REPLY=
+  .hist.format "$BUFFER"
+  print -rS -- "$REPLY"
+  (( HISTNO++ ))  # Otherwise, it won't be found right away by history widgets.
+  fc -AI          # Make it available to other sessions.
+  BUFFER=''
+fi

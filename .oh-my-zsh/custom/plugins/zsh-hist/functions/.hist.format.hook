@@ -1,0 +1,29 @@
+#!/bin/zsh
+
+zstyle -T :hist: auto-format ||
+  return 0
+
+unset PREDISPLAY POSTDISPLAY
+
+[[ -o histignorespace && $BUFFER == ' '* ]] &&
+    return 0
+
+emulate -L zsh
+setopt extendedglob warncreateglobal
+
+local REPLY
+if .hist.format $PREBUFFER$BUFFER; then
+
+  if [[ -n $PREBUFFER ]]; then
+    print -rz "$REPLY"
+    zle .send-break
+  fi
+
+  LBUFFER="$REPLY"
+  RBUFFER=
+fi
+
+[[ -v functions[_zsh_highlight] ]] &&
+    _zsh_highlight
+zle -R
+return 0

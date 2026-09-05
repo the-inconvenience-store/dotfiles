@@ -1,0 +1,226 @@
+#!/bin/zsh
+emulate -L zsh; setopt extendedglob warncreateglobal
+zmodload -F zsh/parameter p:history
+zmodload -F zsh/zutil b:zparseopts
+
+typeset -gHA _HIST__OPTS=(
+    -f 'force: never ask for confirmation'
+    -i 'interactive: always ask for confirmation'
+    -q 'quiet: do not print anything'
+    -s 'silent: same as quiet'
+)
+typeset -gHA _HIST__ARGS=(
+    compress  'delete each entry that differs <delta> chars or less from the next'
+    delete    'remove from history'
+    edit      'delete, then modify & append as new'
+    fix       'delete + get'
+    get       'load into buffer'
+    list      'look, but do not touch'
+    normalize 'delete, then auto-format & append as new'
+    reload    're-initialize local history from file'
+    undo      'roll back to before last command in same session'
+)
+
+.hist.fcparams() {
+  local -a err=()
+  [[ -z $HISTFILE ]] &&
+      err+=( 'hist: error: $HISTFILE has not been set' )
+  (( SAVEHIST == 0 )) &&
+      err+=( 'hist: error: $SAVEHIST is equal to 0' )
+  (( HISTSIZE < 1.2 * SAVEHIST )) &&
+      print -l -u2 - 'hist: warning: $HISTSIZE should be at least 20% larger than $SAVEHIST'
+
+  (( $#err[@] > 0 )) &&
+      print -l -u2 - $err[@]
+  return $#err[@]
+}
+
+.hist.vared() {
+  unset 'compstate[vared]'
+}
+
+.hist.yes() {
+  [[ -v opts[-f] ]] &&
+      return 0
+
+  print -nPr - "%B$1%b"
+  read -q '? [yn] '; local ret=$?
+  print -l
+  return ret
+}
+
+hist() {
+  emulate -L zsh -o extendedglob -o warncreateglobal
+
+  local -A opts=()
+  local REPLY key
+
+  zparseopts -D -A opts f i q s v
+  if [[ -v opts[-s] ]]; then
+    opts[-q]=
+    unset 'opts[-s]'
+  fi
+
+  local act=$1
+
+  if [[ ( -z $act || -z $_HIST__ARGS[(I)$act*] ) && ! -v opts[-q] ]]; then
+    autoload -Uz .hist.help
+    [[ -v 1 ]] &&
+        print -Pru2 -- "hist: %F{9}unknown subcommand ${(q+)act}%f"$'\n'
+    .hist.help
+    ! [[ -v 1 ]]
+    return
+  fi
+
+  case $act in
+    ( r* )
+      .hist.fcparams ||
+          return
+
+      .hist.yes "Replace current history with contents of $HISTFILE?" &&
+          builtin fc -p $HISTFILE $HISTSIZE $SAVEHIST
+      return
+      ;;
+    ( u* )
+      if .hist.yes "Revert last 'hist' action & all entries since then?"; then
+        builtin fc -P
+        local ret=$?
+        if (( ? == 0 )); then
+          builtin fc -W
+          [[ -v opts[-q] ]] ||
+              print 'Revert successful. Previous history restored.'
+        else
+          [[ -v opts[-q] ]] ||
+              print 'Unable to revert. No restore points available in this session.'
+        fi
+        return ret
+      fi
+      return
+      ;;
+  esac
+
+  local -A entries=()
+  local -a ignore=()
+  local +h HISTORY_IGNORE=
+  local sel=
+  shift
+  if [[ $act == c* ]]; then
+    if [[ $1 != <-> ]]; then
+      print -Pru2 -- 'hist compress: %F{9}non-negative integer argument expected'
+      return 1
+    fi
+    for sel in ${(k)history}; do
+      if [[ $history[$sel] == (#a$1)$history[$(( sel + 1 ))] ]]; then
+        ignore+=( "${(b)history[$sel]}" )
+        entries[$sel]=$history[$sel]
+      fi
+    done
+    HISTORY_IGNORE="(${(j:|:)ignore})"
+  elif (( $# )); then
+    for sel do
+      case $sel in
+        ( <1-> )
+          ignore+=( "${(b)history[$sel]}" )
+          entries[$sel]=$history[$sel]
+        ;;
+        ( -<1-> )
+          sel=${${(@k)history}[-sel]}
+          ignore+=( "${(b)history[$sel]}" )
+          entries[$sel]=$history[$sel]
+          ;;
+        ( * )
+          ignore+=( $~~sel )
+          entries+=( "${(@kv)history[(R)$~sel]}" )
+        ;;
+      esac
+    done
+    HISTORY_IGNORE=$ignore; (( $#ignore[@] > 1 )) &&
+        HISTORY_IGNORE="(${(j:|:)ignore})"
+  else
+    print -l -u2 - 'hist: missing selection argument'
+    return 1
+  fi
+
+  if [[ ! -v opts[-q] ]]; then
+    local -i MBEGIN MEND
+    local MATCH faint=$'\e[2m' reverse=$'\e[7m' none=$'\e[0m'
+    for key in ${(@kn)entries}; do
+      print -r - "$faint${(l:$#HISTCMD:)key}$none" \
+          "${entries[$key]//(#m)[^[:print:]]##/$reverse${(V)MATCH}$none}"
+    done
+  fi
+
+  if (( $#entries == 0 )); then
+    [[ -v opts[-q] ]] ||
+        print "No matching history entries found."
+    return 1
+  fi
+
+  local single_plural="${#entries} entries"; (( $#entries == 1 )) &&
+      single_plural='1 entry'
+
+  if [[ $act != [gl]* ]]; then
+    .hist.fcparams ||
+        return
+
+    local msg="Delete $single_plural from history?"; [[ $act == e* ]] &&
+        msg="Merge $single_plural for editing?"
+
+    if [[ $#entries -eq 1 && ! -v opts[-i] ]] || .hist.yes $msg; then
+      builtin fc -W
+      builtin fc -p $HISTFILE $HISTSIZE $SAVEHIST
+      [[ $act != [en]* && ! -v opts[-q] ]] &&
+          print "$single_plural deleted."
+    else
+      [[ -v opts[-q] ]] ||
+          print -l '' '0 entries deleted.'
+      return 1
+    fi
+  fi
+
+  case $act in
+    ( e* )
+      local new=${(vF)entries}
+      print "$faint${(l:COLUMNS::-:):-}$none"
+      {
+        local +h -a compprefuncs=( .hist.vared )
+        vared new
+      } always {
+        if (( TRY_BLOCK_INTERRUPT > 0 )); then
+          TRY_BLOCK_INTERRUPT=0
+          {
+            builtin fc -P
+          } always {
+            builtin fc -W
+            print -l - '' 'Deleted entries restored.'
+          }
+        else
+          print -rS - "$new"
+          builtin fc -W
+          [[ -v opts[-q] ]] ||
+              print -l '' 'New entry saved.'
+        fi
+      }
+      ;;
+    ( [fg]* )
+      print -z ${(Fv)entries}
+      ;;
+    ( n* )
+      local -a lines match mbegin mend
+      local entry
+      for key in ${(@kn)entries}; do
+        entry=$entries[$key]
+        .hist.format "$entry" &&
+          entry="$REPLY"
+        print -rS - "$entry"
+      done
+      builtin fc -W
+      [[ -v opts[-q] ]] ||
+          print "$single_plural reformatted."
+      ;;
+  esac
+
+  typeset -ga reply=( "${(@kv)entries}" )
+}
+
+hist "$@"
