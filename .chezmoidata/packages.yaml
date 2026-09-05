@@ -27,6 +27,7 @@ packages:
       - btop
       - mise
       - tree-sitter-cli
+      - orbstack
     casks:
       - iterm2
       - vorssaint
