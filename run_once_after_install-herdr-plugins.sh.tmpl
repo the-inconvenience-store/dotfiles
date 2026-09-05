@@ -1,0 +1,38 @@
+#!/bin/sh
+set -eu
+
+if ! command -v herdr >/dev/null 2>&1; then
+    printf '%s\n' 'Herdr is not installed; skipping Herdr plugin setup.' >&2
+    exit 0
+fi
+
+# Plugin registration requires a running Herdr server. Starting Herdr once
+# before chezmoi apply makes this setup reproducible without starting a TUI
+# or altering an unrelated session automatically.
+if [ ! -S "$HOME/.config/herdr/herdr.sock" ]; then
+    printf '%s\n' 'Herdr server is not running; run `chezmoi apply` again after starting Herdr to install/link Herdr plugins.' >&2
+    exit 0
+fi
+
+install_plugin() {
+    owner_repo=$1
+    herdr plugin install "$owner_repo" --yes
+}
+
+install_plugin ChmaraX/herdr-nvim
+install_plugin jeffarese/herdr-bar
+install_plugin miiraheart/herdr-beads
+install_plugin AltanS/collie
+
+link_local_plugin() {
+    path=$1
+    if [ -f "$path/herdr-plugin.toml" ]; then
+        herdr plugin link "$path" --enabled
+    fi
+}
+
+{{- if eq .chezmoi.os "darwin" }}
+link_local_plugin "$HOME/dev/herdr-popupx"
+{{- end }}
+link_local_plugin "$HOME/dev/herdr-tilt"
+link_local_plugin "$HOME/dev/herdr-agent-session-title"

@@ -1,0 +1,18 @@
+{{- if eq .chezmoi.os "linux" -}}
+#!/bin/sh
+set -eu
+
+if command -v herdr >/dev/null 2>&1; then
+    exit 0
+fi
+
+if ! command -v curl >/dev/null 2>&1; then
+    printf '%s\n' 'curl is required to install Herdr on Linux.' >&2
+    exit 1
+fi
+
+tmp=$(mktemp)
+trap 'rm -f "$tmp"' EXIT
+curl -fsSL https://herdr.dev/install.sh -o "$tmp"
+sh "$tmp"
+{{- end -}}

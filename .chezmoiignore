@@ -3,3 +3,11 @@ bootstrap
 .DS_Store
 .oh-my-zsh/custom/plugins/nx-completion
 .tmux/plugins/tpm
+.config/herdr/plugins.json
+.config/herdr/.plugins.lock
+.config/herdr/session.json
+.config/herdr/*.log
+.config/herdr/*.sock
+.config/herdr/config.toml.bak.*
+.config/herdr/plugins/config/*/.env
+.config/herdr/plugins/config/*/*.log

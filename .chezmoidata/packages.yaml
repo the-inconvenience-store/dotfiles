@@ -19,6 +19,10 @@ packages:
       - python
       - uv
       - pyenv
+      - neovim
+      - tmux
+      - herdr
+      - mole
     casks: []
   linux:
     apt:
@@ -36,5 +40,6 @@ packages:
       - fzf
       - jq
       - eza
-      - zoxide
       - dua-cli
+      - zoxide
+      - tmux
