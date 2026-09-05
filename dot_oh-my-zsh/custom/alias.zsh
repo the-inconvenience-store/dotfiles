@@ -17,8 +17,8 @@ alias dcr="docker compose down && docker compose up -d"
 alias tailphim=" sudo kubectl port-forward -n seraphim-dev service/traefik-ingress \
   --address 100.82.110.122 \
   80:80 443:443"
-alias dotconf="nvim ~/.dotfiles"
-alias dotup="~/.dotfiles/update.sh"
+alias dotconf="chezmoi edit ~/.zshrc"
+alias dotup="chezmoi update"
 alias tu="tilt up"
 alias td="tilt down"
 #alias tr="tilt down && tilt up"

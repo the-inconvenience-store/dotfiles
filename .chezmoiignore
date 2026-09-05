@@ -1,0 +1,5 @@
+bootstrap
+.gitignore
+.DS_Store
+.oh-my-zsh/custom/plugins/nx-completion
+.tmux/plugins/tpm
