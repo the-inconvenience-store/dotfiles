@@ -1,0 +1,20 @@
+#!/bin/sh
+set -eu
+
+install_dir="$HOME/.local/bin"
+cli="$install_dir/nerd-fonts"
+
+if [ -x "$cli" ]; then
+    exit 0
+fi
+
+if ! command -v curl >/dev/null 2>&1; then
+    printf '%s\n' 'curl is required to install the Nerd Fonts CLI.' >&2
+    exit 1
+fi
+
+mkdir -p "$install_dir"
+tmp=$(mktemp)
+trap 'rm -f "$tmp"' EXIT
+curl -fsSL https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/install.sh -o "$tmp"
+install -m 0755 "$tmp" "$cli"

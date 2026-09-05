@@ -1,0 +1,18 @@
+{{- if eq .chezmoi.os "linux" -}}
+#!/bin/sh
+set -eu
+
+font_dir="${XDG_DATA_HOME:-$HOME/.local/share}/fonts/NerdFonts"
+if find "$font_dir" -type f \( -name 'SymbolsNerdFont*.ttf' -o -name 'SymbolsNerdFont*.otf' \) -print -quit 2>/dev/null | grep -q .; then
+    exit 0
+fi
+
+if ! command -v nerd-fonts >/dev/null 2>&1; then
+    printf '%s\n' 'The Nerd Fonts CLI is required before installing Symbols Only.' >&2
+    exit 1
+fi
+nerd-fonts install SymbolsOnly
+if command -v fc-cache >/dev/null 2>&1; then
+    fc-cache -f "$font_dir"
+fi
+{{- end -}}

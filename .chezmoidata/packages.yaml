@@ -26,8 +26,10 @@ packages:
       - tailscale
       - btop
       - mise
+      - tree-sitter-cli
     casks:
       - vorssaint
+      - font-symbols-only-nerd-font
   linux:
     apt:
       - build-essential
@@ -50,3 +52,5 @@ packages:
       - tmux
       - tailscale
       - btop
+      - tree-sitter-cli
+      - fontconfig
