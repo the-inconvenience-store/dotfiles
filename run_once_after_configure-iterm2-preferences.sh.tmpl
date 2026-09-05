@@ -1,0 +1,11 @@
+{{- if eq .chezmoi.os "darwin" }}
+#!/bin/sh
+set -eu
+
+custom_folder="{{ .chezmoi.homeDir }}/.config/iterm2"
+
+if [ -d "$custom_folder" ] && command -v defaults >/dev/null 2>&1; then
+    defaults write com.googlecode.iterm2 PrefsCustomFolder -string "$custom_folder"
+    defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
+fi
+{{- end }}
