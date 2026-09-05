@@ -30,6 +30,7 @@ packages:
     apt:
       - build-essential
       - curl
+      - rsync
       - file
       - git
       - ufw

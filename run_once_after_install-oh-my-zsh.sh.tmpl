@@ -1,0 +1,26 @@
+#!/bin/sh
+set -eu
+
+zsh_dir="$HOME/.oh-my-zsh"
+if [ -f "$zsh_dir/oh-my-zsh.sh" ]; then
+    exit 0
+fi
+
+if ! command -v git >/dev/null 2>&1; then
+    printf '%s\n' 'git is required to install Oh My Zsh.' >&2
+    exit 1
+fi
+
+if ! command -v rsync >/dev/null 2>&1; then
+    printf '%s\n' 'rsync is required to install Oh My Zsh without overwriting managed custom files.' >&2
+    exit 1
+fi
+
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+
+git clone --depth 1 https://github.com/ohmyzsh/ohmyzsh.git "$tmp/ohmyzsh"
+mkdir -p "$zsh_dir"
+# The chezmoi-managed custom directory may already exist. Only fill missing
+# upstream files so the repository remains authoritative for customizations.
+rsync -a --ignore-existing "$tmp/ohmyzsh/" "$zsh_dir/"
