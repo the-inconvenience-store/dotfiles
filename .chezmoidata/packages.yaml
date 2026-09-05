@@ -24,6 +24,8 @@ packages:
       - herdr
       - mole
       - tailscale
+      - btop
+      - mise
     casks:
       - vorssaint
   linux:
@@ -47,3 +49,4 @@ packages:
       - zoxide
       - tmux
       - tailscale
+      - btop
