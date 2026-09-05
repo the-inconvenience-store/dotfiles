@@ -1,0 +1,12 @@
+{{- if eq .chezmoi.os "linux" -}}
+#!/bin/sh
+set -eu
+
+if ! command -v apt-get >/dev/null 2>&1; then
+    printf '%s\n' 'This Linux package definition requires apt-get.' >&2
+    exit 1
+fi
+
+sudo apt-get update
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y {{ range .packages.linux.apt }}"{{ . }}" {{ end }}
+{{- end }}

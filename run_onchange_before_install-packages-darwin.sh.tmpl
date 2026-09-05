@@ -1,0 +1,18 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/bin/bash
+set -euo pipefail
+
+if ! command -v brew >/dev/null 2>&1; then
+    printf '%s\n' 'Homebrew is not available after the Homebrew bootstrap script.' >&2
+    exit 1
+fi
+
+brew bundle --file=/dev/stdin <<'EOF'
+{{- range .packages.darwin.brews }}
+brew "{{ . }}"
+{{- end }}
+{{- range .packages.darwin.casks }}
+cask "{{ . }}"
+{{- end }}
+EOF
+{{- end }}

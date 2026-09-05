@@ -1,0 +1,40 @@
+packages:
+  darwin:
+    brews:
+      - coreutils
+      - git
+      - zoxide
+      - neofetch
+      - bat
+      - eza
+      - dua-cli
+      - ripgrep
+      - zsh-autosuggestions
+      - make
+      - fzf
+      - jq
+      - mongosh
+      - node
+      - rustup
+      - python
+      - uv
+      - pyenv
+    casks: []
+  linux:
+    apt:
+      - build-essential
+      - curl
+      - file
+      - git
+      - ufw
+      - gpg
+      - zsh
+      - neovim
+      - fonts-powerline
+      - bat
+      - ripgrep
+      - fzf
+      - jq
+      - eza
+      - zoxide
+      - dua-cli
