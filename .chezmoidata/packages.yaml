@@ -28,6 +28,7 @@ packages:
       - mise
       - tree-sitter-cli
       - lspmux
+      - orbstack
     casks:
       - iterm2
       - orbstack
