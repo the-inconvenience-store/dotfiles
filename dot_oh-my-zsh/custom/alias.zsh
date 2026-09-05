@@ -14,23 +14,24 @@ alias 9='z -9'
 alias dcu="docker compose up -d"
 alias dcd="docker compose down"
 alias dcr="docker compose down && docker compose up -d"
-alias tailphim=" sudo kubectl port-forward -n seraphim-dev service/traefik-ingress \
-  --address 100.82.110.122 \
-  80:80 443:443"
 alias dotconf="chezmoi edit ~/.zshrc"
 alias dotup="chezmoi update"
-alias tu="tilt up"
-alias td="tilt down"
-#alias tr="tilt down && tilt up"
-alias rotate90="displayplacer \"id:5A071958-B098-403C-BD96-1910ACE949C2 degree:90\""
-alias rotate0="displayplacer \"id:5A071958-B098-403C-BD96-1910ACE949C2 degree:0\""
+if (( $+commands[tilt] )); then
+  alias tu="tilt up"
+  alias td="tilt down"
+  #alias tr="tilt down && tilt up"
+fi
 alias cls-complete-cache="rm -rf ~/.zcompdump* && autoload -U compinit && compinit -D"
-alias tf="terraform"
-alias tfp="terraform plan"
-alias tfa="terraform apply"
-alias osv="oci session validate --auth security_token --profile seraphim-melb"
-alias osa="oci session authenticate --region ap-melbourne-1 --profile-name seraphim-melb"
-alias osr="oci session refresh --profile seraphim-melb"
+if (( $+commands[terraform] )); then
+  alias tf="terraform"
+  alias tfp="terraform plan"
+  alias tfa="terraform apply"
+fi
+if (( $+commands[oci] )); then
+  alias osv="oci session validate --auth security_token --profile seraphim-melb"
+  alias osa="oci session authenticate --region ap-melbourne-1 --profile-name seraphim-melb"
+  alias osr="oci session refresh --profile seraphim-melb"
+fi
 
 # List Herdr workspaces in a readable table.
 hwl() {
