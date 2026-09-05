@@ -14,6 +14,36 @@ alias 9='z -9'
 alias dcu="docker compose up -d"
 alias dcd="docker compose down"
 alias dcr="docker compose down && docker compose up -d"
+
+# Inspect which process is using a TCP port.
+fpp() {
+  if (( $# != 1 )); then
+    print -u2 "Usage: fpp <port_number>"
+    return 1
+  fi
+
+  local port="$1"
+  if [[ -z "$port" || "$port" == *[!0-9]* ]]; then
+    print -u2 "Error: Invalid port number. Must be an integer between 1 and 65535."
+    return 1
+  fi
+
+  local -i port_number=$((10#$port))
+  if (( port_number < 1 || port_number > 65535 )); then
+    print -u2 "Error: Invalid port number. Must be an integer between 1 and 65535."
+    return 1
+  fi
+
+  if ! (( $+commands[lsof] )); then
+    print -u2 "fpp: lsof is required but was not found"
+    return 1
+  fi
+
+  print "Checking TCP port $port_number..."
+  lsof -i "tcp:$port_number"
+  print 'Run `kill -9 <PID>` to destroy the process'
+}
+
 alias dotconf="chezmoi edit ~/.zshrc"
 alias dotup="chezmoi update"
 if (( $+commands[tilt] )); then

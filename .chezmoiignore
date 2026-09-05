@@ -11,3 +11,6 @@ bootstrap
 .config/herdr/config.toml.bak.*
 .config/herdr/plugins/config/*/.env
 .config/herdr/plugins/config/*/*.log
+{{ if ne .chezmoi.os "darwin" }}
+scripts/teemz/teemz.sh
+{{ end }}
