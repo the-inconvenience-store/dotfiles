@@ -9,7 +9,6 @@ packages:
       - eza
       - dua-cli
       - ripgrep
-      - zsh-autosuggestions
       - direnv
       - make
       - fzf
@@ -28,7 +27,6 @@ packages:
       - btop
       - mise
       - tree-sitter-cli
-      - orbstack
     casks:
       - iterm2
       - vorssaint

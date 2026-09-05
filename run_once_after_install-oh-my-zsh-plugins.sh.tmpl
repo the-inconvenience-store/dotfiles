@@ -1,0 +1,20 @@
+#!/bin/sh
+set -eu
+
+plugin_dir="$HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+
+if [ -d "$plugin_dir/.git" ]; then
+    exit 0
+fi
+
+if [ -e "$plugin_dir" ]; then
+    printf '%s\n' "Oh My Zsh autosuggestions path exists but is not a Git checkout; leaving it unchanged: $plugin_dir" >&2
+    exit 0
+fi
+
+if ! command -v git >/dev/null 2>&1; then
+    printf '%s\n' 'git is required to install the Oh My Zsh autosuggestions plugin.' >&2
+    exit 1
+fi
+
+git clone --depth 1 https://github.com/zsh-users/zsh-autosuggestions.git "$plugin_dir"

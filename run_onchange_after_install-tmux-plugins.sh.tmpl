@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+
+tpm="$HOME/.tmux/plugins/tpm"
+if [ ! -d "$tpm/.git" ]; then
+    if [ -e "$tpm" ]; then
+        printf '%s\n' "TPM exists but is not a Git checkout; refusing to replace it: $tpm" >&2
+        exit 1
+    fi
+    if ! command -v git >/dev/null 2>&1; then
+        printf '%s\n' 'git is required before installing tmux plugin manager.' >&2
+        exit 1
+    fi
+    git clone --depth 1 https://github.com/tmux-plugins/tpm.git "$tpm"
+fi
+
+"$tpm/bin/install_plugins"
