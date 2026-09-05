@@ -29,6 +29,7 @@ packages:
       - mise
       - tree-sitter-cli
     casks:
+      - iterm2
       - vorssaint
       - font-symbols-only-nerd-font
   linux:
