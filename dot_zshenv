@@ -103,19 +103,27 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-export BIN_PATH=/Users/samstevens/.local/bin:$PATH
+export BIN_PATH="$HOME/.local/bin:$PATH"
 # pnpm
-export PNPM_HOME="/Users/samstevens/Library/pnpm"
+if [[ "$OSTYPE" == darwin* ]]; then
+  export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
+else
+  export PNPM_HOME="${PNPM_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/pnpm}"
+fi
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH:$BIN_PATH" ;;
 esac
 # pnpm end
-export PKG_CONFIG_PATH="/opt/homebrew/lib/pkgconfig:$PKG_CONFIG_PATH"
-export SDL2_INCLUDE_PATH="/opt/homebrew/include"
-export SDL2_LIB_PATH="/opt/homebrew/lib"
+if (( $+commands[brew] )); then
+    brew_prefix="$(brew --prefix)"
+    export PKG_CONFIG_PATH="$brew_prefix/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+    export SDL2_INCLUDE_PATH="$brew_prefix/include"
+    export SDL2_LIB_PATH="$brew_prefix/lib"
+    eval "$(brew shellenv)"
+fi
 
-export PATH="$PATH:/Users/samstevens/.dotnet/tools"
+export PATH="$PATH:$HOME/.dotnet/tools"
 
 if type brew &>/dev/null; then
     FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
