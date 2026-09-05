@@ -112,10 +112,12 @@ if [[ "$OSTYPE" == darwin* ]]; then
 else
   export PNPM_HOME="${PNPM_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/pnpm}"
 fi
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH:$BIN_PATH" ;;
-esac
+if [[ -d "$PNPM_HOME" ]]; then
+  case ":$PATH:" in
+    *":$PNPM_HOME:"*) ;;
+    *) export PATH="$PNPM_HOME:$PATH:$BIN_PATH" ;;
+  esac
+fi
 # pnpm end
 if (( $+commands[brew] )); then
     brew_prefix="$(brew --prefix)"
@@ -125,8 +127,12 @@ if (( $+commands[brew] )); then
     eval "$(brew shellenv)"
 fi
 
-eval "$(zoxide init zsh)"
-export PATH="$PATH:$HOME/.dotnet/tools"
+if (( $+commands[zoxide] )); then
+    eval "$(zoxide init zsh)"
+fi
+if [[ -d "$HOME/.dotnet/tools" ]]; then
+    export PATH="$PATH:$HOME/.dotnet/tools"
+fi
 
 if type brew &>/dev/null; then
     FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
@@ -134,16 +140,18 @@ if type brew &>/dev/null; then
     compinit
 fi
 
-eval "$(/opt/homebrew/bin/brew shellenv)"
-
 # Added by OrbStack: command-line tools and integration
 # This won't be added again if you remove it.
-source ~/.orbstack/shell/init.zsh 2>/dev/null || :
+[[ -r ~/.orbstack/shell/init.zsh ]] && source ~/.orbstack/shell/init.zsh
 
 # Added by `rbenv init` on Wed 16 Jul 2025 14:11:56 AEST
-eval "$(rbenv init - --no-rehash zsh)"
+if (( $+commands[rbenv] )); then
+    eval "$(rbenv init - --no-rehash zsh)"
+fi
 
-source <(kubectl completion zsh)
+if (( $+commands[kubectl] )); then
+    source <(kubectl completion zsh)
+fi
 
 
 # >>> conda initialize >>>
@@ -163,14 +171,21 @@ if [ -x "$HOME/miniconda3/bin/conda" ]; then
 fi
 # <<< conda initialize <<<
 export SOPS_AGE_KEY_FILE="$HOME/.config/sops/age/keys.txt"
-export PATH="$PATH:$(go env GOPATH)/bin"
-export PATH="$PATH:$HOME/.cargo/bin"
+if (( $+commands[go] )); then
+    export PATH="$PATH:$(go env GOPATH)/bin"
+fi
+if [[ -d "$HOME/.cargo/bin" ]]; then
+    export PATH="$PATH:$HOME/.cargo/bin"
+fi
 
 # bun completions
-[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+[[ -s "$HOME/.bun/_bun" ]] && source "$HOME/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
+if [[ -d "$BUN_INSTALL/bin" ]]; then
+    export PATH="$BUN_INSTALL/bin:$PATH"
+fi
 
-source ~/.oh-my-zsh/custom/plugins/zsh-hist/zsh-hist.plugin.zsh
+[[ -r ~/.oh-my-zsh/custom/plugins/zsh-hist/zsh-hist.plugin.zsh ]] && \
+    source ~/.oh-my-zsh/custom/plugins/zsh-hist/zsh-hist.plugin.zsh
