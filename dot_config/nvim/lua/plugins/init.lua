@@ -334,6 +334,17 @@ return {
 
   { "ChmaraX/herdr-nvim", opts = {} },
   {
+    "xvzc/chezmoi.nvim",
+    cmd = { "ChezmoiEdit", "ChezmoiList" },
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = {
+      edit = {
+        watch = false,
+        force = false,
+      },
+    },
+  },
+  {
     "RRethy/vim-illuminate",
     event = { "BufReadPost", "BufNewFile" },
     opts = {
