@@ -71,7 +71,7 @@ ZSH_THEME="robbyrussell"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 autoload -U compinit; compinit
-plugins=(git zsh-autosuggestions nx-completion direnv)
+plugins=(git zsh-autosuggestions direnv)
 
 source $ZSH/oh-my-zsh.sh
 

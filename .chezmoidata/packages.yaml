@@ -10,6 +10,7 @@ packages:
       - dua-cli
       - ripgrep
       - zsh-autosuggestions
+      - direnv
       - make
       - fzf
       - jq
@@ -40,6 +41,7 @@ packages:
       - ufw
       - gpg
       - zsh
+      - direnv
       - neovim
       - fonts-powerline
       - bat
