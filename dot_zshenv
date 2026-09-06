@@ -117,6 +117,15 @@ if [[ -d "$PNPM_HOME" ]]; then
   esac
 fi
 # pnpm end
+if [[ "$OSTYPE" == darwin* ]] && ! (( $+commands[brew] )); then
+    for brew_bin in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+        if [[ -x "$brew_bin" ]]; then
+            eval "$("$brew_bin" shellenv)"
+            break
+        fi
+    done
+fi
+
 if (( $+commands[brew] )); then
     brew_prefix="$(brew --prefix)"
     export PKG_CONFIG_PATH="$brew_prefix/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
