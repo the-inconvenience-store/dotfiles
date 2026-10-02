@@ -60,7 +60,44 @@ fi
 if (( $+commands[oci] )); then
   alias osv="oci session validate --auth security_token --profile seraphim-melb"
   alias osa="oci session authenticate --region ap-melbourne-1 --profile-name seraphim-melb"
-  alias osr="oci session refresh --profile seraphim-melb"
+
+  # Refresh the Oracle session once, or keep refreshing every 45 minutes with -w/--watch.
+  osr() {
+    local watch=0
+    if (( $# == 1 )); then
+      case "$1" in
+        -w|--watch) watch=1 ;;
+        *) print -u2 -- "usage: osr [-w|--watch]"; return 2 ;;
+      esac
+    elif (( $# > 1 )); then
+      print -u2 -- "usage: osr [-w|--watch]"
+      return 2
+    fi
+
+    if (( ! watch )); then
+      command oci session refresh --profile seraphim-melb
+      return $?
+    fi
+
+    while true; do
+      print -- "[$(date '+%Y-%m-%d %H:%M:%S')] Refreshing Oracle session..."
+      if command oci session refresh --profile seraphim-melb; then
+        print -- "[$(date '+%Y-%m-%d %H:%M:%S')] Refresh succeeded; next refresh in 45 minutes."
+      else
+        local rc=$?
+        print -u2 -- "[$(date '+%Y-%m-%d %H:%M:%S')] Refresh failed (exit $rc); stopping watch."
+        return "$rc"
+      fi
+
+      if sleep 2700; then
+        :
+      else
+        local rc=$?
+        print -u2 -- "[$(date '+%Y-%m-%d %H:%M:%S')] Watch stopped (sleep exit $rc)."
+        return "$rc"
+      fi
+    done
+  }
 fi
 
 # List Herdr workspaces in a readable table.
