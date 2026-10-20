@@ -4,6 +4,10 @@ import json
 import pathlib
 import os
 import tempfile
+import pty
+import select
+import shutil
+import time
 import subprocess
 import unittest
 
@@ -89,6 +93,121 @@ class Profiles(unittest.TestCase):
         aliases = render("dot_oh-my-zsh/custom/server-commands.zsh.tmpl", "server")
         self.assertIn("batcat", aliases)
         self.assertIn("fdfind", aliases)
+
+    def test_server_prompt_adds_identity_without_replacing_stock_theme(self):
+        name = "dot_oh-my-zsh/custom/themes/robbyrussell.zsh-theme.tmpl"
+        self.assertTrue((SOURCE / name).is_file(), "Server prompt theme is missing")
+        self.assertEqual(render(name, "workstation").strip(), "")
+        self.assertEqual(render(name).strip(), "")
+        theme = render(name, "server")
+        subprocess.run(["zsh", "-n"], input=theme, text=True, check=True)
+        omz = pathlib.Path.home() / ".oh-my-zsh"
+        self.assertTrue((omz / "themes/robbyrussell.zsh-theme").is_file())
+        probe = '''autoload -Uz colors; colors
+source "$ZSH/themes/robbyrussell.zsh-theme"
+stock=$PROMPT
+stock_git_prefix=$ZSH_THEME_GIT_PROMPT_PREFIX
+'''
+        probe += theme + '''
+[[ "$PROMPT" == '%n@%m '"$stock" ]] || exit 1
+[[ "$ZSH_THEME_GIT_PROMPT_PREFIX" == "$stock_git_prefix" ]] || exit 2
+'''
+        probe += theme + '''
+[[ "$PROMPT" == '%n@%m '"$stock" ]] || exit 3
+print -P -- "$PROMPT"
+'''
+        result = subprocess.run(["zsh", "-f"], input=probe, text=True, capture_output=True, env=dict(os.environ, ZSH=str(omz)))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("@", result.stdout)
+        self.assertIn("➜", result.stdout)
+
+    def test_server_sets_login_shell_once_without_starting_interactive_shell(self):
+        name = "run_after_zz-set-default-shell.sh.tmpl"
+        self.assertTrue((SOURCE / name).is_file(), "Server login-shell hook is missing")
+        script = render(name, "server")
+        self.assertEqual(render(name, "workstation").strip(), "")
+        self.assertEqual(render(name, "server", "darwin").strip(), "")
+        self.assertNotIn("exec zsh", script)
+        scratch = pathlib.Path.home() / ".hermes/cache/scratch"
+        with tempfile.TemporaryDirectory(dir=str(scratch) if scratch.is_dir() else None) as tmp:
+            tools = {
+                "id": 'case "$1" in -un) printf "tester\\n";; -u) printf "1000\\n";; esac',
+                "getent": 'read -r shell < "$STATE"; printf "tester:x:1000:1000::/home/tester:%s\\n" "$shell"',
+                "zsh": "exit 0",
+                "grep": "exit 0",
+                "sudo": 'printf "%s\\n" "$*" >> "$CALLS"; exec "$@"',
+                "chsh": 'printf "%s\\n" "$2" > "$STATE"',
+            }
+            for tool, body in tools.items():
+                path = pathlib.Path(tmp, tool)
+                path.write_text("#!/bin/sh\n" + body + "\n")
+                path.chmod(0o755)
+            pathlib.Path(tmp, "state").write_text("/bin/bash\n")
+            env = dict(os.environ, PATH=tmp + ":/usr/bin:/bin", STATE=tmp + "/state", CALLS=tmp + "/calls")
+            for _ in range(2):
+                subprocess.run(["/bin/sh"], input=script, env=env, text=True, check=True, capture_output=True)
+            self.assertEqual(pathlib.Path(tmp, "state").read_text().strip(), tmp + "/zsh")
+            self.assertEqual(pathlib.Path(tmp, "calls").read_text().splitlines(), ["chsh -s " + tmp + "/zsh tester"])
+
+    def test_server_setup_wrapper_applies_before_entering_zsh(self):
+        path = SOURCE / "bootstrap/server.sh"
+        self.assertTrue(path.is_file(), "Server setup wrapper is missing")
+        script = path.read_text()
+        self.assertIn('exec "$SHELL" -l', script)
+        self.assertIn('[ -t 0 ]', script)
+        self.assertLess(script.index('apply'), script.index('exec "$SHELL" -l'))
+        subprocess.run(["sh", "-n", str(path)], check=True)
+        scratch = pathlib.Path.home() / ".hermes/cache/scratch"
+        with tempfile.TemporaryDirectory(dir=str(scratch) if scratch.is_dir() else None) as tmp:
+            root = pathlib.Path(tmp)
+            bootstrap = root / "source/bootstrap"
+            bootstrap.mkdir(parents=True)
+            wrapper = bootstrap / "server.sh"
+            shutil.copyfile(path, wrapper)
+            tools = root / "bin"
+            tools.mkdir()
+            for name, body in {
+                "uname": "printf 'Linux\\n'",
+                "chezmoi": 'printf "%s\\n" "$*" >> "$CALLS"; case "$*" in *" apply") exit "${APPLY_RC:-0}";; esac',
+                "zsh": 'printf "HANDOFF:%s:%s\\n" "$1" "$SHELL"',
+            }.items():
+                tool = tools / name
+                tool.write_text("#!/bin/sh\n" + body + "\n")
+                tool.chmod(0o755)
+            env = dict(os.environ, PATH=str(tools) + ":/usr/bin:/bin", CALLS=str(root / "calls"))
+            result = subprocess.run(["/bin/sh", str(wrapper)], env=env, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertNotIn("HANDOFF:", result.stdout)
+            self.assertIn("no interactive terminal", result.stdout)
+            for rc in (0, 23):
+                master, slave = pty.openpty()
+                proc = subprocess.Popen(["/bin/sh", str(wrapper)], stdin=slave, stdout=slave, stderr=slave, env=dict(env, APPLY_RC=str(rc)))
+                os.close(slave)
+                try:
+                    output = b""
+                    deadline = time.monotonic() + 10
+                    while time.monotonic() < deadline:
+                        if select.select([master], [], [], 0.1)[0]:
+                            try:
+                                chunk = os.read(master, 65536)
+                                if not chunk:
+                                    break
+                                output += chunk
+                            except OSError:
+                                break
+                        elif proc.poll() is not None:
+                            break
+                    proc.wait(timeout=1)
+                    self.assertEqual(proc.returncode, rc, output.decode())
+                    if rc == 0:
+                        self.assertIn("HANDOFF:-l:" + str(tools / "zsh"), output.decode())
+                    else:
+                        self.assertNotIn(b"HANDOFF:", output)
+                finally:
+                    if proc.poll() is None:
+                        proc.kill()
+                        proc.wait()
+                    os.close(master)
 
     def test_server_package_lists_are_small_and_workstation_default_is_unchanged(self):
         linux = render("run_onchange_before_install-packages-linux.sh.tmpl", "server")

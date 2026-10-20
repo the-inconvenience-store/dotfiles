@@ -1,0 +1,32 @@
+{{- if and (eq .chezmoi.os "linux") (eq (index . "profile" | default "workstation") "server") -}}
+#!/bin/sh
+set -eu
+
+user=$(id -un)
+zsh_path=$(command -v zsh)
+current_shell=$(getent passwd "$user" | cut -d: -f7)
+if [ -z "$current_shell" ]; then
+    printf '%s\n' "Cannot determine the login shell for $user." >&2
+    exit 1
+fi
+if [ "$current_shell" = "$zsh_path" ]; then
+    exit 0
+fi
+if ! grep -Fxq "$zsh_path" /etc/shells; then
+    printf '%s\n' "Zsh is not registered in /etc/shells: $zsh_path" >&2
+    exit 1
+fi
+
+if [ "$(id -u)" -eq 0 ]; then
+    chsh -s "$zsh_path" "$user"
+else
+    sudo chsh -s "$zsh_path" "$user"
+fi
+if [ "$(getent passwd "$user" | cut -d: -f7)" != "$zsh_path" ]; then
+    printf '%s\n' "Could not verify the new login shell for $user." >&2
+    exit 1
+fi
+printf '%s\n' "Default shell set to $zsh_path for $user."
+# Do not start an interactive child here: it would block chezmoi apply.
+# bootstrap/server.sh enters Zsh after chezmoi has finished successfully.
+{{- end }}

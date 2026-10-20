@@ -17,8 +17,9 @@ from being overwritten during apply.
 
 The Linux server installer targets Ubuntu 24.04+ and Debian 13+, on amd64 or
 arm64. Older distributions and non-APT distributions are not covered by this
-profile. Use a normal user with sudo access, or root. The installer does not
-change your login shell, SSH settings, firewall policy, or Tailscale login.
+profile. Use a normal user with sudo access, or root. At the end of a successful
+Linux server apply, the installer sets Zsh as that account's login shell. It
+does not change SSH settings, firewall policy, or Tailscale login.
 
 Install Git, CA certificates, curl and chezmoi first, then:
 
@@ -26,16 +27,25 @@ Install Git, CA certificates, curl and chezmoi first, then:
 chezmoi init --promptChoice 'Machine profile=server' the-inconvenience-store/dotfiles
 chezmoi diff
 chezmoi apply --dry-run --verbose
-chezmoi apply
-exec zsh
+exec sh "$(chezmoi source-path)/bootstrap/server.sh"
 ```
 
 These commands use the published repository, so local changes must be pushed
 before another machine can use them. To use an existing clone, use its source
 path, e.g. `chezmoi --source /path/to/dotfiles init --promptChoice ...`.
 
-To make Zsh your login shell, deliberately run `chsh -s "$(command -v zsh)"`.
-Keep an existing SSH session open until you have verified a new login works.
+The wrapper applies the server profile and then replaces itself with a Zsh
+login shell when attached to an interactive terminal. Using `exec sh` also
+replaces the original Bash session, so exiting Zsh does not drop back into it.
+Noninteractive runs finish without opening a shell. If apply fails, the wrapper
+stops without opening Zsh. Plain `chezmoi apply` sets the default shell too, but
+cannot replace its calling shell; use `exec zsh -l` to enter it manually.
+
+The login-shell hook checks the account database, not the potentially stale
+`$SHELL` variable. It does nothing when Zsh is already the default, verifies
+the account after changing it, and uses sudo only when needed. Keep an existing
+SSH session open until you have verified a new login works. The hook is Linux
+server-only; workstation/macOS shell settings are unchanged.
 
 Tailscale is installed through its official Linux repository installer. On a
 normal systemd VPS the package installs the daemon service. Authentication is
@@ -51,7 +61,9 @@ to a tailnet. Container tests verify installation, not daemon networking.
 ## Included
 
 - Oh My Zsh with the existing robbyrussell theme, autosuggestions, zsh-hist,
-  portable aliases, direnv and zoxide integration.
+  portable aliases, direnv and zoxide integration. On server profiles only, the
+  prompt is prefixed with `username@hostname` (short hostname); the upstream
+  colours, status arrow, directory and Git display are preserved.
 - Yazi, bat, eza, ripgrep, fd, fzf, jq, tmux and its existing plugins, and btop.
 - Neovim with the existing NvChad appearance, editing and navigation, but
   without the workstation's language servers, Rust/Go/debugger/Herdr tooling,
