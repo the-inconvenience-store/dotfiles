@@ -8,6 +8,14 @@ packages:
       - bat
       - eza
       - dua-cli
+      # Yazi and its optional preview/search dependencies (file is provided by macOS).
+      - yazi
+      - ffmpeg-full
+      - sevenzip
+      - poppler
+      - fd
+      - resvg
+      - imagemagick-full
       - ripgrep
       - direnv
       - make

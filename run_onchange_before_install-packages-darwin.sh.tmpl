@@ -15,4 +15,7 @@ brew "{{ . }}"
 cask "{{ . }}"
 {{- end }}
 EOF
+
+# Yazi's full media dependencies are keg-only; expose their tools on PATH.
+brew link ffmpeg-full imagemagick-full --force --overwrite
 {{- end }}

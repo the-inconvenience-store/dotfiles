@@ -1,5 +1,13 @@
 return {
   {
+    "dmtrKovalenko/fff",
+    lazy = false, -- fff initialises its native index on first use.
+    build = function()
+      require("fff.download").download_or_build_binary()
+    end,
+    opts = {},
+  },
+  {
     "stevearc/conform.nvim",
     event = "BufWritePre",
     opts = require "configs.conform",
