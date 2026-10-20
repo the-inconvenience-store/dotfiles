@@ -2,5 +2,6 @@
 # Preserve the upstream theme's colours, status arrow, directory and Git prompt.
 source "$ZSH/themes/robbyrussell.zsh-theme"
 # Resolve the current account and short hostname at prompt-render time.
-PROMPT='%n@%m '"$PROMPT"
+# Match the stock theme's cyan directory accent, then reset before its arrow.
+PROMPT="%{$fg[cyan]%}%n@%m%{$reset_color%} $PROMPT"
 {{- end }}

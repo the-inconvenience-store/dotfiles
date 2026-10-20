@@ -107,13 +107,14 @@ class Profiles(unittest.TestCase):
 source "$ZSH/themes/robbyrussell.zsh-theme"
 stock=$PROMPT
 stock_git_prefix=$ZSH_THEME_GIT_PROMPT_PREFIX
+identity_prefix="%{$fg[cyan]%}%n@%m%{$reset_color%} "
 '''
         probe += theme + '''
-[[ "$PROMPT" == '%n@%m '"$stock" ]] || exit 1
+[[ "$PROMPT" == "$identity_prefix$stock" ]] || exit 1
 [[ "$ZSH_THEME_GIT_PROMPT_PREFIX" == "$stock_git_prefix" ]] || exit 2
 '''
         probe += theme + '''
-[[ "$PROMPT" == '%n@%m '"$stock" ]] || exit 3
+[[ "$PROMPT" == "$identity_prefix$stock" ]] || exit 3
 print -P -- "$PROMPT"
 '''
         result = subprocess.run(["zsh", "-f"], input=probe, text=True, capture_output=True, env=dict(os.environ, ZSH=str(omz)))
