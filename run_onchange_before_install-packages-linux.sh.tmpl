@@ -1,4 +1,8 @@
 {{- if eq .chezmoi.os "linux" -}}
+{{- $packages := .packages.linux.apt -}}
+{{- if eq (index . "profile" | default "workstation") "server" -}}
+{{- $packages = .packages.server.linux.apt -}}
+{{- end -}}
 #!/bin/sh
 set -eu
 
@@ -7,6 +11,18 @@ if ! command -v apt-get >/dev/null 2>&1; then
     exit 1
 fi
 
+{{ if eq (index . "profile" | default "workstation") "server" -}}
+as_root() {
+    if [ "$(id -u)" -eq 0 ]; then
+        "$@"
+    else
+        sudo "$@"
+    fi
+}
+as_root apt-get update
+as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends {{ range $packages }}"{{ . }}" {{ end }}
+{{ else -}}
 sudo apt-get update
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y {{ range .packages.linux.apt }}"{{ . }}" {{ end }}
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y {{ range $packages }}"{{ . }}" {{ end }}
+{{- end -}}
 {{- end }}

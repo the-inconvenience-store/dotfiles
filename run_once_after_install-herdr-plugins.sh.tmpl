@@ -1,3 +1,4 @@
+{{- if ne (index . "profile" | default "workstation") "server" -}}
 #!/bin/sh
 set -eu
 
@@ -36,3 +37,4 @@ link_local_plugin "$HOME/dev/herdr-popupx"
 {{- end }}
 link_local_plugin "$HOME/dev/herdr-tilt"
 link_local_plugin "$HOME/dev/herdr-agent-session-title"
+{{- end }}

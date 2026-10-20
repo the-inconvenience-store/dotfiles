@@ -1,0 +1,2 @@
+-- Managed by chezmoi; absent profile data preserves workstation behavior.
+return { profile = {{ index . "profile" | default "workstation" | quote }} }

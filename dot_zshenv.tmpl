@@ -1,3 +1,11 @@
+{{- if eq (index . "profile" | default "workstation") "server" -}}
+# Keep noninteractive server shells quiet; Oh My Zsh loads from .zshrc only.
+typeset -U path
+path=("$HOME/.local/bin" $path)
+export PATH
+export EDITOR=nvim
+export VISUAL="$EDITOR"
+{{- else -}}
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
@@ -156,3 +164,4 @@ fi
 if (( $+commands[rbenv] )); then
     eval "$(rbenv init - --no-rehash zsh)"
 fi
+{{- end }}

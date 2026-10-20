@@ -1,4 +1,44 @@
 packages:
+  server:
+    darwin:
+      brews:
+        - git
+        - zsh
+        - direnv
+        - yazi
+        - bat
+        - eza
+        - ripgrep
+        - fd
+        - fzf
+        - zoxide
+        - jq
+        - neovim
+        - tmux
+        - btop
+        - tailscale
+    linux:
+      # Neovim and Yazi use verified upstream binaries; Tailscale uses its
+      # official repository installer. No fonts or media preview stack.
+      apt:
+        - ca-certificates
+        - curl
+        - git
+        - rsync
+        - file
+        - unzip
+        - build-essential
+        - zsh
+        - direnv
+        - bat
+        - eza
+        - ripgrep
+        - fd-find
+        - fzf
+        - zoxide
+        - jq
+        - tmux
+        - btop
   darwin:
     brews:
       - coreutils

@@ -1,0 +1,16 @@
+{{- if eq (index . "profile" | default "workstation") "server" -}}
+# Debian/Ubuntu name these binaries batcat and fdfind.
+if (( $+commands[batcat] )); then
+  alias bat=batcat
+  alias cat='batcat --paging=never'
+elif (( $+commands[bat] )); then
+  alias cat='bat --paging=never'
+fi
+if (( ! $+commands[fd] && $+commands[fdfind] )); then
+  alias fd=fdfind
+fi
+# The small server inventory does not install dua.
+if (( ! $+commands[dua] )); then
+  unalias du 2>/dev/null || true
+fi
+{{- end }}

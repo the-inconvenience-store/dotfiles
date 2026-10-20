@@ -1,0 +1,6 @@
+{{- $profile := promptChoiceOnce . "profile" "Machine profile" (list "workstation" "server") "workstation" -}}
+[edit]
+command = "nvim"
+
+[data]
+profile = {{ $profile | quote }}

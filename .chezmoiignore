@@ -1,4 +1,8 @@
 bootstrap
+# The init template owns per-machine data; never overwrite it during apply.
+.config/chezmoi/chezmoi.toml
+.config/nvim/tests
+.config/nvim/tests/**
 .gitignore
 .DS_Store
 .oh-my-zsh/custom/plugins/nx-completion
@@ -13,4 +17,12 @@ bootstrap
 .config/herdr/plugins/config/*/*.log
 {{ if ne .chezmoi.os "darwin" }}
 scripts/teemz/teemz.sh
+{{ end }}
+{{ if eq (index . "profile" | default "workstation") "server" }}
+.config/herdr
+.config/herdr/**
+.config/iterm2
+.config/iterm2/**
+scripts
+scripts/**
 {{ end }}

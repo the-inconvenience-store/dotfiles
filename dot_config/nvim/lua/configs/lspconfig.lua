@@ -1,3 +1,7 @@
+if require("configs.profile").is_server then
+  return
+end
+
 require("nvchad.configs.lspconfig").defaults()
 
 local nvlsp = require "nvchad.configs.lspconfig"

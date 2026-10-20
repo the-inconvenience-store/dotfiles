@@ -1,0 +1,35 @@
+{{- if eq (index . "profile" | default "workstation") "server" -}}
+#!/bin/sh
+set -eu
+# lock sha256: {{ include "dot_config/nvim/lazy-lock.json" | sha256sum }}
+# spec sha256: {{ include "dot_config/nvim/lua/plugins/init.lua" | sha256sum }}
+
+export PATH="$HOME/.local/bin:$PATH"
+config="${XDG_CONFIG_HOME:-$HOME/.config}/nvim"
+data="${XDG_DATA_HOME:-$HOME/.local/share}/nvim"
+lockfile="$config/lazy-lock.json"
+tmp=$(mktemp)
+cp "$lockfile" "$tmp"
+# A first lazy bootstrap can rewrite the lock before the explicit restore runs.
+# Preserve the canonical file even if a network/install operation fails.
+trap 'cp "$tmp" "$lockfile"; rm -f "$tmp"' EXIT
+nvim --headless '+Lazy! install' +qa
+cp "$tmp" "$lockfile"
+nvim --headless '+Lazy! restore' +qa
+
+# Neovim can return zero despite a failed plugin task. Verify the actual Git
+# revisions, not only its process status. Disabled plugins have no directory.
+for plugin in NvChad base46 ui telescope.nvim nvim-tree.lua; do
+    test -d "$data/lazy/$plugin/.git"
+done
+jq -r 'to_entries[] | [.key, .value.commit] | @tsv' "$tmp" |
+while IFS="$(printf '\t')" read -r plugin expected; do
+    if [ -d "$data/lazy/$plugin/.git" ]; then
+        actual=$(git -C "$data/lazy/$plugin" rev-parse HEAD)
+        if [ "$actual" != "$expected" ]; then
+            printf '%s\n' "Plugin revision mismatch: $plugin ($actual != $expected)" >&2
+            exit 1
+        fi
+    fi
+done
+{{- end }}

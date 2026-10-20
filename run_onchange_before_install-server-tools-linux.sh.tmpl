@@ -1,0 +1,68 @@
+{{- if and (eq .chezmoi.os "linux") (eq (index . "profile" | default "workstation") "server") -}}
+#!/bin/sh
+set -eu
+
+# Versions and upstream release SHA256 digests are pinned together. Install
+# per-user so a server's distro packages and other accounts remain untouched.
+nvim_version="v0.11.7"
+yazi_version="v26.9.1"
+case "{{ .chezmoi.arch }}" in
+    amd64)
+        nvim_arch=x86_64
+        yazi_arch=x86_64
+        nvim_sha=38a7c6317f94503841096c00e8fde05ef04b9472fc9d7d62b6e033cecd6f7991
+        yazi_sha=9b9c39decccf8cb0ff53a7d637d38f8a79d93bbd0099f4ea9c619ef6bb392f5d
+        ;;
+    arm64)
+        nvim_arch=arm64
+        yazi_arch=aarch64
+        nvim_sha=99bb3c53604e83ce18fc0b459e34cf1a5e212f4e5fbe2eb136b3c18092ae9905
+        yazi_sha=dd569daecaae914185f295634109295ccd25c1b42b02eb89a74f651970024f2e
+        ;;
+    *)
+        printf '%s\n' 'The server tool installer supports Linux amd64 and arm64 only.' >&2
+        exit 1
+        ;;
+esac
+
+bin="$HOME/.local/bin"
+opt="$HOME/.local/opt"
+mkdir -p "$bin" "$opt"
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+
+link_tool() {
+    if [ -e "$bin/$1" ] && [ ! -L "$bin/$1" ]; then
+        printf '%s\n' "Refusing to replace an existing non-symlink: $bin/$1" >&2
+        exit 1
+    fi
+    ln -sfn "$2" "$bin/$1"
+}
+
+nvim_dir="$opt/nvim-$nvim_version"
+if [ ! -x "$nvim_dir/bin/nvim" ]; then
+    curl -fSL --retry 3 "https://github.com/neovim/neovim/releases/download/$nvim_version/nvim-linux-$nvim_arch.tar.gz" -o "$tmp/nvim.tar.gz"
+    printf '%s  %s\n' "$nvim_sha" "$tmp/nvim.tar.gz" | sha256sum -c -
+    tar -xzf "$tmp/nvim.tar.gz" -C "$tmp"
+    mv "$tmp/nvim-linux-$nvim_arch" "$nvim_dir"
+fi
+link_tool nvim "$nvim_dir/bin/nvim"
+
+yazi_dir="$opt/yazi-$yazi_version"
+if [ ! -x "$yazi_dir/yazi" ] || [ ! -x "$yazi_dir/ya" ]; then
+    curl -fSL --retry 3 "https://github.com/sxyazi/yazi/releases/download/$yazi_version/yazi-$yazi_arch-unknown-linux-musl.zip" -o "$tmp/yazi.zip"
+    printf '%s  %s\n' "$yazi_sha" "$tmp/yazi.zip" | sha256sum -c -
+    unzip -q "$tmp/yazi.zip" -d "$tmp"
+    mv "$tmp/yazi-$yazi_arch-unknown-linux-musl" "$yazi_dir"
+fi
+link_tool yazi "$yazi_dir/yazi"
+link_tool ya "$yazi_dir/ya"
+
+# fd is needed by Yazi and Neovim as a real executable, not just a shell alias.
+if ! command -v fd >/dev/null 2>&1 && command -v fdfind >/dev/null 2>&1; then
+    link_tool fd "$(command -v fdfind)"
+fi
+if ! command -v bat >/dev/null 2>&1 && command -v batcat >/dev/null 2>&1; then
+    link_tool bat "$(command -v batcat)"
+fi
+{{- end }}

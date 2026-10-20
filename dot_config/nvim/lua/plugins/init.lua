@@ -1,6 +1,9 @@
+local server = require("configs.profile").is_server
+
 return {
   {
     "dmtrKovalenko/fff",
+    enabled = not server,
     lazy = false, -- fff initialises its native index on first use.
     build = function()
       require("fff.download").download_or_build_binary()
@@ -9,12 +12,14 @@ return {
   },
   {
     "stevearc/conform.nvim",
+    enabled = not server,
     event = "BufWritePre",
     opts = require "configs.conform",
   },
 
   {
     "MunifTanjim/prettier.nvim",
+    enabled = not server,
     event = { "BufReadPre", "BufNewFile" },
     cmd = "Prettier",
     dependencies = { "nvimtools/none-ls.nvim" },
@@ -65,6 +70,7 @@ return {
 
   {
     "neovim/nvim-lspconfig",
+    enabled = not server,
     lazy = false,
     config = function()
       require "configs.lspconfig"
@@ -73,7 +79,20 @@ return {
 
   {
     "nvim-treesitter/nvim-treesitter",
+    -- The locked main-branch parser manager targets Neovim 0.12+. Older
+    -- servers retain Vim syntax highlighting instead of loading unsupported code.
+    enabled = not server or vim.fn.has "nvim-0.12" == 1,
+    build = not server and ":TSUpdate | TSInstallAll" or false,
     opts = function(_, opts)
+      if server then
+        -- No CLI/toolchain or parser downloads are required for basic editing.
+        -- :TSInstallAll remains an explicit opt-in after installing the TS CLI.
+        opts.ensure_installed = {
+          "vim", "lua", "vimdoc", "bash", "json", "yaml", "markdown", "markdown_inline",
+        }
+        opts.auto_install = false
+        return
+      end
       opts.ensure_installed = opts.ensure_installed or {}
 
       local required = {
@@ -112,6 +131,7 @@ return {
 
   {
     "MeanderingProgrammer/render-markdown.nvim",
+    enabled = not server or vim.fn.has "nvim-0.12" == 1,
     ft = { "markdown" },
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
@@ -119,12 +139,13 @@ return {
     },
     opts = {
       preset = "obsidian",
-      completions = { lsp = { enabled = true } },
+      completions = { lsp = { enabled = not server } },
     },
   },
 
   {
     "nvim-treesitter/nvim-treesitter-context",
+    enabled = not server or vim.fn.has "nvim-0.12" == 1,
     event = { "BufReadPost", "BufNewFile" },
     opts = {
       enable = true,
@@ -154,6 +175,7 @@ return {
 
   {
     "mfussenegger/nvim-lint",
+    enabled = not server,
     event = { "BufReadPost", "BufNewFile" },
     config = function()
       local lint = require("lint")
@@ -258,6 +280,7 @@ return {
 
   {
     "rachartier/tiny-inline-diagnostic.nvim",
+    enabled = not server,
     event = "VeryLazy",
     priority = 1000,
     config = function()
@@ -282,6 +305,7 @@ return {
 
   {
     "windwp/nvim-ts-autotag",
+    enabled = not server,
     opts = {
       opts = {
         enable_close = true,
@@ -301,6 +325,7 @@ return {
 
   {
     "olexsmir/gopher.nvim",
+    enabled = not server,
     ft = "go",
     opts = {
       commands = {
@@ -315,11 +340,13 @@ return {
 
   {
     "mfussenegger/nvim-dap",
+    enabled = not server,
     lazy = true,
   },
 
   {
     "leoluz/nvim-dap-go",
+    enabled = not server,
     ft = "go",
     dependencies = "mfussenegger/nvim-dap",
     opts = {},
@@ -337,10 +364,16 @@ return {
   },
   {
     "rcarriga/nvim-dap-ui",
+    enabled = not server,
     dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" },
   },
 
-  { "ChmaraX/herdr-nvim", opts = {} },
+  { "ChmaraX/herdr-nvim", enabled = not server, opts = {} },
+  { "mason-org/mason.nvim", enabled = not server },
+  -- Explicitly disable transitive tooling too. lazy then preserves their
+  -- lock entries, rather than rewriting the shared lockfile on server installs.
+  { "nvimtools/none-ls.nvim", enabled = not server },
+  { "nvim-neotest/nvim-nio", enabled = not server },
   {
     "xvzc/chezmoi.nvim",
     cmd = { "ChezmoiEdit", "ChezmoiList" },
@@ -371,6 +404,7 @@ return {
   },
   {
     "hedengran/fga.nvim",
+    enabled = not server,
     lazy = false,
     opts = {
       install_treesitter_grammar = false,
@@ -379,6 +413,7 @@ return {
   },
   {
     "mrcjkb/rustaceanvim",
+    enabled = not server,
     -- To avoid being surprised by breaking changes,
     -- I recommend you set a version range
     version = "^8",

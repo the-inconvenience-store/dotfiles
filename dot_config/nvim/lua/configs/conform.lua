@@ -1,3 +1,7 @@
+if require("configs.profile").is_server then
+  return {}
+end
+
 local options = {
   formatters_by_ft = {
     lua = { "stylua" },

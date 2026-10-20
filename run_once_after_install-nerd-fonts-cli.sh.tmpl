@@ -1,3 +1,4 @@
+{{- if ne (index . "profile" | default "workstation") "server" -}}
 #!/bin/sh
 set -eu
 
@@ -18,3 +19,4 @@ tmp=$(mktemp)
 trap 'rm -f "$tmp"' EXIT
 curl -fsSL https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/install.sh -o "$tmp"
 install -m 0755 "$tmp" "$cli"
+{{- end }}

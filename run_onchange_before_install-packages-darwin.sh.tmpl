@@ -1,4 +1,9 @@
 {{- if eq .chezmoi.os "darwin" -}}
+{{- $server := eq (index . "profile" | default "workstation") "server" -}}
+{{- $brews := .packages.darwin.brews -}}
+{{- if $server -}}
+{{- $brews = .packages.server.darwin.brews -}}
+{{- end -}}
 #!/bin/bash
 set -euo pipefail
 
@@ -8,14 +13,17 @@ if ! command -v brew >/dev/null 2>&1; then
 fi
 
 brew bundle --file=/dev/stdin <<'EOF'
-{{- range .packages.darwin.brews }}
+{{- range $brews }}
 brew "{{ . }}"
 {{- end }}
+{{- if not $server }}
 {{- range .packages.darwin.casks }}
 cask "{{ . }}"
 {{- end }}
+{{- end }}
 EOF
-
+{{ if not $server }}
 # Yazi's full media dependencies are keg-only; expose their tools on PATH.
 brew link ffmpeg-full imagemagick-full --force --overwrite
+{{- end }}
 {{- end }}
