@@ -107,7 +107,7 @@ class Profiles(unittest.TestCase):
 source "$ZSH/themes/robbyrussell.zsh-theme"
 stock=$PROMPT
 stock_git_prefix=$ZSH_THEME_GIT_PROMPT_PREFIX
-identity_prefix="%{$fg[cyan]%}%n@%m%{$reset_color%} "
+identity_prefix="%{$fg_bold[cyan]%}%n@%m%{$reset_color%} "
 '''
         probe += theme + '''
 [[ "$PROMPT" == "$identity_prefix$stock" ]] || exit 1
