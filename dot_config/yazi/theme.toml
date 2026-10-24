@@ -1,0 +1,114 @@
+# Charizard — burnt orange, cream, and ember brown.
+# Main panes inherit the terminal's transparent background.
+#:schema https://yazi-rs.github.io/schemas/theme.json
+
+[mgr]
+cwd = { fg = "#F29C38", bold = true }
+find_keyword = { fg = "#FFA726", bold = true, underline = true }
+find_position = { fg = "#FFD39A", bold = true }
+symlink_target = { fg = "#C58A45", italic = true }
+marker_copied = { fg = "#6BCB77", bg = "#6BCB77" }
+marker_cut = { fg = "#EF5350", bg = "#EF5350" }
+marker_marked = { fg = "#FFD39A", bg = "#FFD39A" }
+marker_selected = { fg = "#F29C38", bg = "#F29C38" }
+count_copied = { fg = "#6BCB77", bg = "#2B160E", bold = true }
+count_cut = { fg = "#EF5350", bg = "#2B160E", bold = true }
+count_selected = { fg = "#FFD39A", bg = "#5A260D", bold = true }
+border_style = { fg = "#7B593A" }
+
+[indicator]
+parent = { fg = "#FFD39A", bg = "#2B160E" }
+current = { fg = "#FFF0D4", bg = "#5A260D", bold = true }
+preview = { fg = "#FFD39A", bg = "#2B160E", underline = true }
+
+[tabs]
+active = { fg = "#FFD39A", bg = "#5A260D", bold = true }
+inactive = { fg = "#C58A45", bg = "#2B160E" }
+
+[mode]
+normal_main = { fg = "#0B0503", bg = "#F29C38", bold = true }
+normal_alt = { fg = "#F29C38", bg = "#2B160E" }
+select_main = { fg = "#0B0503", bg = "#FFD39A", bold = true }
+select_alt = { fg = "#FFD39A", bg = "#2B160E" }
+unset_main = { fg = "#0B0503", bg = "#EF5350", bold = true }
+unset_alt = { fg = "#EF5350", bg = "#2B160E" }
+
+[status]
+overall = { fg = "#FFF0D4", bg = "#2B160E" }
+perm_type = { fg = "#F29C38" }
+perm_read = { fg = "#FFD39A" }
+perm_write = { fg = "#EF5350" }
+perm_exec = { fg = "#6BCB77" }
+perm_sep = { fg = "#826144" }
+progress_label = { fg = "#FFF0D4", bold = true }
+progress_normal = { fg = "#F29C38", bg = "#2B160E" }
+progress_error = { fg = "#EF5350", bg = "#2B160E" }
+
+[which]
+border = { fg = "#C75B1D" }
+mask = { bg = "#120806" }
+cand = { fg = "#F29C38", bold = true }
+rest = { fg = "#826144" }
+desc = { fg = "#FFD39A" }
+separator_style = { fg = "#7B593A" }
+
+[confirm]
+border = { fg = "#C75B1D" }
+title = { fg = "#F29C38", bold = true }
+body = { fg = "#FFF0D4" }
+list = { fg = "#FFD39A" }
+btn_yes = { fg = "#FFF0D4", bg = "#5A260D", bold = true }
+btn_no = { fg = "#C58A45", bg = "#2B160E" }
+
+[spot]
+border = { fg = "#C75B1D" }
+title = { fg = "#F29C38", bold = true }
+tbl_col = { fg = "#FFD39A" }
+tbl_cell = { fg = "#FFF0D4", bg = "#5A260D" }
+
+[notify]
+title_info = { fg = "#F29C38" }
+title_warn = { fg = "#FFA726" }
+title_error = { fg = "#EF5350" }
+
+[pick]
+border = { fg = "#C75B1D" }
+active = { fg = "#FFD39A", bg = "#5A260D", bold = true }
+inactive = { fg = "#FFF0D4" }
+
+[input]
+border = { fg = "#C75B1D" }
+title = { fg = "#F29C38" }
+value = { fg = "#FFF0D4" }
+selected = { fg = "#FFF0D4", bg = "#5A260D" }
+
+[cmp]
+border = { fg = "#C75B1D" }
+active = { fg = "#FFD39A", bg = "#5A260D", bold = true }
+inactive = { fg = "#FFF0D4" }
+
+[tasks]
+border = { fg = "#C75B1D" }
+title = { fg = "#F29C38" }
+hovered = { fg = "#FFD39A", bg = "#5A260D", bold = true }
+
+[help]
+border = { fg = "#C75B1D" }
+chord = { fg = "#F29C38", bold = true }
+action = { fg = "#FFF0D4" }
+hovered = { fg = "#FFD39A", bg = "#5A260D", bold = true }
+
+[filetype]
+rules = [
+  { url = "*", is = "orphan", fg = "#EF5350", bold = true },
+  { url = "*", is = "dummy", fg = "#EF5350" },
+  { url = "*/", is = "dummy", fg = "#EF5350" },
+  { mime = "**/image/*", fg = "#FFD39A" },
+  { mime = "**/{audio,video}/*", fg = "#E2832B" },
+  { mime = "**/application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "#C75B1D" },
+  { mime = "**/application/{pdf,doc,rtf}", fg = "#FFD39A" },
+  { mime = "vfs/{absent,stale}", fg = "#826144" },
+  { url = "*", is = "exec", fg = "#6BCB77" },
+  { url = "*/", fg = "#F29C38", bold = true },
+  { url = "*", fg = "#FFF0D4" },
+]
