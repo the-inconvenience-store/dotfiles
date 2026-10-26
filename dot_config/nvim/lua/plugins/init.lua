@@ -360,6 +360,16 @@ return {
       filters = {
         git_ignored = false,
       },
+      filesystem_watchers = {
+        ignore_dirs = {
+          "/.ccls-cache",
+          "/build",
+          "/node_modules",
+          "/target",
+          "/.zig-cache",
+          "/trivy-cache\\(/\\|$\\)",
+        },
+      },
     },
   },
   {
